@@ -8,13 +8,10 @@ type Dispatcher interface {
 	AfterStart()
 	BeforeTerminate()
 	BeforeBatchProcess()
-	BeforeProcessingMessage()
+	BeforeProcessingMessage(index int)
 }
 
-type goroutineDispatcher struct {
-	throughput int
-	index      int
-}
+type goroutineDispatcher int
 
 func (goroutineDispatcher) Schedule(fn func()) {
 	go fn()
@@ -25,21 +22,20 @@ func (d goroutineDispatcher) AfterStart() {
 func (d goroutineDispatcher) BeforeTerminate() {
 }
 func (d goroutineDispatcher) Throughput() int {
-	return d.throughput
+	return int(d)
 }
 
-func (d goroutineDispatcher) BeforeProcessingMessage() {
-	if d.index > d.throughput {
-		d.index = 0
+func (d goroutineDispatcher) BeforeProcessingMessage(index int) {
+	if index > int(d) {
+		index = 0
 		runtime.Gosched()
 	}
-	d.index++
 }
 
 func (d goroutineDispatcher) BeforeBatchProcess() {
-	d.index = 0
+
 }
 
 func NewDefaultDispatcher(throughput int) Dispatcher {
-	return &goroutineDispatcher{throughput: throughput}
+	return goroutineDispatcher(throughput)
 }
