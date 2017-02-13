@@ -106,7 +106,7 @@ func (m *defaultMailbox) run() {
 	m.dispatcher.BeforeBatchProcess()
 	i := 0
 	for {
-		m.dispatcher.BeforeProcessingMessage(i)
+		m.dispatcher.BeforeProcessingMessage(&i)
 		i++
 		// keep processing system messages until queue is empty
 		if msg = m.systemMailbox.Pop(); msg != nil {

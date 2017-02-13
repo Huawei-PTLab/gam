@@ -8,7 +8,7 @@ type Dispatcher interface {
 	AfterStart()
 	BeforeTerminate()
 	BeforeBatchProcess()
-	BeforeProcessingMessage(index int)
+	BeforeProcessingMessage(index *int)
 }
 
 type goroutineDispatcher int
@@ -25,9 +25,9 @@ func (d goroutineDispatcher) Throughput() int {
 	return int(d)
 }
 
-func (d goroutineDispatcher) BeforeProcessingMessage(index int) {
-	if index > int(d) {
-		index = 0
+func (d goroutineDispatcher) BeforeProcessingMessage(index *int) {
+	if *index > int(d) {
+		*index = 0
 		runtime.Gosched()
 	}
 }
